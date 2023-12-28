@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <title>Bonjour depuis le rendu d'Electron !</title>
+  </head>
+  <body>
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <div id="ecranPreJeu1">
+      Ne pas streamer le jeu jusqu'a la fin de la configation (affichage de l'IP, accé admin de la partie, etc...)
+      <div id="boutonJoueur1" class="bouton">Joueur 1</div>
+      <div id="boutonJoueur2" class="bouton">Joueur 2</div>
+    </div>
+    <div id="ecranPreJeu2">
+      <div id="ecranPreJeu2joueur1">        
+        <div>Mon ip est : <span id="ecranPreJeu2monIp"></span></div>
+        <div><label for="ecranPreJeu2port">Port : </label><input id="ecranPreJeu2port" value="8080"></div>
+        <div id="ecranPreJeu2boutonSuivant" class="bouton">Suivant</div>
+      </div>
+      <div id="ecranPreJeu2joueur2">
+        <div><label for="ecranPreJeu2ipJoueur1">Ip du joueur 1</label><input id="ecranPreJeu2ipJoueur1"></div>
+        <div><label for="ecranPreJeu2portJoueur1">Port du joueur 1</label><input id="ecranPreJeu2portJoueur1" value="8080"></div>
+        <div id="ecranPreJeu2boutonSuivant2" class="bouton">Suivant</div>
+
+      </div>
+    </div>
+    <label for="videoSource">Webcam : </label>
+    <select id="videoSource"><option value="aucun">Choisir la webcam</option></select>
+      <script src="./renderer.js"></script>
+  </body>
+</html>
