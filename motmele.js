@@ -3,6 +3,14 @@ var motMeleleCore=(opts) => {
   var mm={
     version: "0.0.1",
   };
+  
+  var theParent;
+  if (opts.idHtml) {
+    theParent = document.getElementById(opts.idHtml);
+  } else {
+    theParent = document.body;
+  }
+
   // on verifie les options
   var opts=opts || {};
   // on verifie la largeur
@@ -40,6 +48,34 @@ var motMeleleCore=(opts) => {
   ];
   mm.listeMot=[];
   mm.listeMotData={};
+  
+
+  var generationHtml=() => {
+    var grille=document.createElement("div");
+    grille.className="motMeleGrille";
+    theParent.appendChild(grille);
+    // on fouille la grille
+    for (var i=0;i<mm.hauteur;i++) {
+      var divLigne=document.createElement("div");
+      divLigne.className="motMeleLigne";
+      grille.appendChild(divLigne);
+      for (var j=0;j<mm.largeur;j++) {
+        // on regarde si c'est null ou la meme lettre que la premiere      
+        var lettre=document.createElement("div");
+        lettre.className="motMeleLettre";
+        if (mm.grille[i][j]!=null) {
+          lettre.innerHTML=mm.grille[i][j];
+        } else {
+          lettre.innerHTML='&nbsp;';
+          // on ajoute une class vide
+          lettre.className+=" motMeleVide";
+        }
+        divLigne.appendChild(lettre);
+      }
+    }
+  }
+
+
   var nombreDeLettreRestante=mm.hauteur*mm.largeur;
   var peuPlace=(mot,orientation,x,y) => {
     // on verifie si on peut placer le mot
@@ -60,7 +96,7 @@ var motMeleleCore=(opts) => {
       }
       // on passe a la lettre suivante
       x2+=orientation[0];
-      y2+=orientation[1];
+      y2+=orientation[1]; 
     }
     if (qteLetreNouvelle==0) {
       return false;
@@ -121,6 +157,10 @@ var motMeleleCore=(opts) => {
   };
 
   var fouilleMots=async (mots) => {
+    // on mélange les mots
+    mots.sort(() => {
+      return 0.5 - Math.random();
+    });
     var marchePas=0;
     // on fouille les mots
     for (var i=0;i<mots.length;i++) {
@@ -130,49 +170,89 @@ var motMeleleCore=(opts) => {
         marchePas=0;
       } else {
         marchePas++;
-        if (marchePas>10) {
+        if (marchePas>30) {
           // on passe à la taille suivante
           return;
         }
       }
     }
   }
+  mm.pret=false;
+  var motDicoInit=async () => {
+    var mots=['bas','haut','clair','bien','rond','chat','top','beau','page','image','live','joli','fin',
+    'un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix',
+    'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo'
+    ];
+    fouillesMotsParTaille(motParTaille(mots));
+    mm.pret=true;
+  }
+  var fouillesMotsParTaille=async (data) => {
+    var mots=data[0];
+    var plusLong=data[1];
+    // on fouille les mots des plus long au plus court
+    for (var i=plusLong;i>0;i--) {
+      if (mots[i]!=undefined) {
+        await fouilleMots(mots[i]);
+      }
+    }
+  }
+  var motParTaille=(mots) => {
+    var plusLong=0;
+    var motsParTaille=[];
+    for (var i=0;i<mots.length;i++) {
+      // longuer du mot
+      var longueur=mots[i].length;
+      // on regarde si cette taille à déjà un tableau
+      if (motsParTaille[longueur]==undefined) {
+        motsParTaille[longueur]=[];
+      }
+      // on ajoute le mot
+      motsParTaille[longueur].push(mots[i]);
+      // on regarde si c'est le plus long
+      if (longueur>plusLong) {
+        plusLong=longueur;
+      }
+    }
+    return [motsParTaille,plusLong];
+
+  }
 
   // on verifie les mots imposés
   if (opts.mots) {
     var motImposetInit=async () => {
       // on trie les mots par longueur
-      var motsImposerParTaille=[];
-      var plusLong=0;
-      for (var i=0;i<opts.mots.length;i++) {
-        // longuer du mot
-        var longueur=opts.mots[i].length;
-        // on regarde si cette taille à déjà un tableau
-        if (motsImposerParTaille[longueur]==undefined) {
-          motsImposerParTaille[longueur]=[];
-        }
-        // on ajoute le mot
-        motsImposerParTaille[longueur].push(opts.mots[i]);
-        // on regarde si c'est le plus long
-        if (longueur>plusLong) {
-          plusLong=longueur;
-        }
-      }
+      await fouillesMotsParTaille(motParTaille(opts.mots));
+      await motDicoInit();
       
-      // on fouille les mots des plus long au plus court
-      for (var i=plusLong;i>0;i--) {
-        if (motsImposerParTaille[i]!=undefined) {
-          await fouilleMots(motsImposerParTaille[i]);
-        }
-      }
     }
     motImposetInit();
+  } else {
+    motDicoInit();
   }
+
+  // on attent que la grille soit prete
+  var attenteGrille=async () => {
+    if (mm.pret) {
+      generationHtml();
+    } else {
+      setTimeout(attenteGrille,100);
+    }
+  }
+  attenteGrille();
+
+
+
+  
+  console.log(mm);
   return mm;
 };
 var mmTeste=motMeleleCore({
-  longueur:10,
+  largeur:15,
   hauteur:10,
-  mots:['laure','phelipon','ago','coloriages','crayon','papier','feutre','stylo','gomme','couleurs','youtube','twitch','samuel',
+  idHtml:'teste',
+  mots:['laure','phelipon','ago','coloriages','magique','detente','crayon','dessin','peinture','pinceau',
+  'papier','feutre','stylo','gomme','couleurs','youtube','twitch','samuel',
+  'rond','chat',
+  'marqueur','aquarelle','texture','art','page','image','live',
   'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo']
 })
