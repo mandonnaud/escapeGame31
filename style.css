@@ -1,0 +1,23 @@
+#webcam {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  height: 260px;
+  background: #615858;
+}
+body  {
+  background: #040404;
+    color: #FFF;
+}
+.bouton {
+  display: inline-block;
+  padding: 26px 46px;
+  background: #000;
+  border: 1px solid #FFF;
+  border-radius: 9px;
+  cursor: pointer;
+}
+* {
+  box-sizing: border-box;
+}

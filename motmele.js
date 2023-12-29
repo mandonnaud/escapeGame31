@@ -48,12 +48,42 @@ var motMeleleCore=(opts) => {
   ];
   mm.listeMot=[];
   mm.listeMotData={};
+
+  var miseEnPage=() => {
+    var largeurGeneral=theParent.offsetWidth;
+    var hauteurGeneral=theParent.offsetHeight-85;
+
+    grille.style.width=largeurGeneral+'px';
+    grille.style.height=hauteurGeneral+'px';
+    grille.style.top='85px';
+    var largeurLettre=largeurGeneral/mm.largeur;
+    var hauteurLettre=hauteurGeneral/mm.hauteur;
+    var taille=Math.min(largeurLettre,hauteurLettre);
+    for (var i=0;i<motMeleLettreAll.length;i++) {
+      motMeleLettreAll[i].style.width=taille+'px';
+      motMeleLettreAll[i].style.height=taille+'px';
+      motMeleLettreAll[i].style.lineHeight=taille+'px';
+      motMeleLettreAll[i].style.fontSize=(taille*0.8)+'px';
+    }
+    
+
+
+  }
+  
+  var motMeleLettreAll;
+  var grille=document.createElement("div");
+  grille.id="motMeleGrille";
+  theParent.appendChild(grille);
+  var divMotRestant=document.createElement("div");
+  divMotRestant.id="motMeleMotRestant";
+  theParent.appendChild(divMotRestant);
+  var divPopUp=document.createElement("div");
+  divPopUp.id="motMelePopUp";
+  theParent.appendChild(divPopUp);
   
 
   var generationHtml=() => {
-    var grille=document.createElement("div");
-    grille.className="motMeleGrille";
-    theParent.appendChild(grille);
+   
     // on fouille la grille
     for (var i=0;i<mm.hauteur;i++) {
       var divLigne=document.createElement("div");
@@ -71,8 +101,12 @@ var motMeleleCore=(opts) => {
           lettre.className+=" motMeleVide";
         }
         divLigne.appendChild(lettre);
+        
       }
     }
+    motMeleLettreAll=document.querySelectorAll('.motMeleLettre');
+    
+    miseEnPage();
   }
 
 
@@ -85,11 +119,11 @@ var motMeleleCore=(opts) => {
     for (var i=0;i<mot.length;i++) {
       // on verifie si on est dans la grille
       if (x2<0 || x2>=mm.hauteur || y2<0 || y2>=mm.largeur) {
-        return false;
+        return -1;
       }
       // on verifie si la case est vide ou la meme lettre
       if (mm.grille[x2][y2]!=null && mm.grille[x2][y2]!=mot[i]) {
-        return false;
+        return -1;
       }
       if (mm.grille[x2][y2]==null) {
         qteLetreNouvelle++;
@@ -99,23 +133,38 @@ var motMeleleCore=(opts) => {
       y2+=orientation[1]; 
     }
     if (qteLetreNouvelle==0) {
-      return false;
+      return -1;
     }
-    return true;
+    return qteLetreNouvelle/mot.length;
   };
-  var place=(mot,orientation,x,y) => {
+  var place=(mot,lettres,orientation,x,y,inverse) => {
     // on place le mot
     var x2=x;
     var y2=y;
-    for (var i=0;i<mot.length;i++) {
+    for (var i=0;i<lettres.length;i++) {
       if (mm.grille[x2][y2]==null) {
         nombreDeLettreRestante--;
       }
-      mm.grille[x2][y2]=mot[i];
+      if (inverse) {
+        mm.grille[x2][y2]=lettres[lettres.length-i-1];
+      } else {
+        mm.grille[x2][y2]=lettres[i];
+      }
       // on passe a la lettre suivante
       x2+=orientation[0];
       y2+=orientation[1];
     }
+    mm.listeMot.push(mot);
+    if (inverse) {
+      orientation[0]*=-1;
+      orientation[1]*=-1;
+    }
+    mm.listeMotData[mot]={
+      mot: mot,
+      x: inverse?x2:x,
+      y: inverse?y2:y,
+      orientation: orientation
+    };
   };
   // on place un mot dans la grille
   var placeurDeMot=(mot) => {
@@ -136,16 +185,11 @@ var motMeleleCore=(opts) => {
         if (mm.grille[i][j]==null || mm.grille[i][j]==lettres[0]) {
           // on verifie si on peut placer le mot
           for(var o=0; o<orientation.length;o++) {
-            if (peuPlace(lettres,orientation[o],i,j)) {
+            var qte=peuPlace(lettres,orientation[o],i,j);
+            if (qte!=-1) {
               // on place le mot
-              place(lettres,orientation[o],i,j);
-              mm.listeMot.push(mot);
-              mm.listeMotData[mot]={
-                mot: mot,
-                x: i,
-                y: j,
-                orientation: orientation[o]
-              };
+              place(mot,lettres,orientation[o],i,j,qte==1?true:false);
+              
               // on sort de la boucle
               return true;
             }
@@ -180,10 +224,11 @@ var motMeleleCore=(opts) => {
   mm.pret=false;
   var motDicoInit=async () => {
     var mots=['bas','haut','clair','bien','rond','chat','top','beau','page','image','live','joli','fin',
-    'un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix',
-    'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo'
+    'un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','son','ane','moi','toi',
+    'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo','cours'
     ];
     fouillesMotsParTaille(motParTaille(mots));
+    divMotRestant.innerHTML='<strong>'+mm.listeMot.length+'</strong> mots à trouver';
     mm.pret=true;
   }
   var fouillesMotsParTaille=async (data) => {
@@ -240,19 +285,132 @@ var motMeleleCore=(opts) => {
   }
   attenteGrille();
 
+  var listeMotTrouve=[];
 
+  var attenteTrouver=() => {
+    // on regarde si il y a quelques chose dans la listeMotTrouve
+    if (listeMotTrouve.length>0) {
+      
+      // on affiche une popup
+      var mot=listeMotTrouve[0].mot;
+      var qui=listeMotTrouve[0].qui;
+      // on supprime le mot de la liste
+      listeMotTrouve.shift();
+      divPopUp.innerHTML='<strong>'+mot+'</strong> trouvé par <strong>'+qui+'</strong>';
+      // on fait apparaitre la popup et on la fait disparaitre avec un slide up
+      var hauteur=divPopUp.offsetHeight;
+      var top=-hauteur;
+      var vitesse=hauteur/60;
+      // en 600ms on fait apparaitre descendre la popup à 0
+      divPopUp.style.top=top+'px';
+      var popupUpIn=window.setInterval(() => {
+        top+=vitesse;
+        divPopUp.style.top=top+'px';
+        if (top>=0) {
+          window.clearInterval(popupUpIn);
+          divPopUp.style.top='0px';
+          // on passe en rouge les lettres du mot une par une
+          var motData=mm.listeMotData[mot];
+          var x=motData.x;
+          var y=motData.y;
+          var orientation=motData.orientation;
+          var x2=x;
+          var y2=y;
+          var i=0;
+          var etape=0;
+          var popupUpRouge=window.setInterval(() => {
+            switch(etape) {
+              case 0:
+              case 2:
+                motMeleLettreAll[x2*mm.largeur+y2].classList.add('motMeleLettreRouge');
+              break;
+              case 1:
+              case 3:
+                // on enleve le rouge
+                motMeleLettreAll[x2*mm.largeur+y2].classList.remove("motMeleLettreRouge");
+              break;
+            }
+            
+            // on passe a la lettre suivante
+            x2+=orientation[0];
+            y2+=orientation[1];
+            i++;
+            if (i>=mot.length) {
+              etape++;
+              i=0;
+              x2=x;
+              y2=y;
+
+              if (etape>=4) {
+
+                window.clearInterval(popupUpRouge);
+                // on attend 1 seconde
+                var popupUpOut=window.setInterval(() => {
+                  top-=vitesse;
+                  divPopUp.style.top=top+'px';
+                  if (top<=-hauteur) {
+                    window.clearInterval(popupUpOut);
+                    // on supprime le mot de la liste
+                    listeMotTrouve.shift();
+                    // on attend 1 seconde
+                    setTimeout(attenteTrouver,1000);
+                  }
+                },10);
+              }
+            }
+          
+
+
+          },100);
+
+          
+        }
+        
+      });
+    } else {
+      setTimeout(attenteTrouver,100);
+    }
+  }
+  attenteTrouver();
+
+
+  mm.proposition=(mot,qui) => {
+
+    if (mm.pret==false) {
+      return;
+    }
+    var mot=mot.toLowerCase();
+    if (mm.listeMotData[mot]!=undefined) {
+      if (mm.listeMotData[mot].trouver!=undefined) {
+        return;
+      }
+      mm.listeMotData[mot].trouver=true;
+      var data=mm.listeMotData[mot];
+      var x=data.x;
+      var y=data.y;
+      var orientation=data.orientation;
+      var x2=x;
+      var y2=y;
+      for (var i=0;i<mot.length;i++) {
+        motMeleLettreAll[x2*mm.largeur+y2].className+=" motMeleLettreTrouve";
+        // on passe a la lettre suivante
+        x2+=orientation[0];
+        y2+=orientation[1];
+      }
+      // on supprime le mot de la liste
+      var index=mm.listeMot.indexOf(mot);
+      mm.listeMot.splice(index,1);
+      listeMotTrouve.push({
+        mot: mot,
+        qui: qui
+      });
+      divMotRestant.innerHTML='<strong>'+mm.listeMot.length+'</strong> mots à trouver';
+    }
+  };
 
   
-  console.log(mm);
   return mm;
 };
-var mmTeste=motMeleleCore({
-  largeur:15,
-  hauteur:10,
-  idHtml:'teste',
-  mots:['laure','phelipon','ago','coloriages','magique','detente','crayon','dessin','peinture','pinceau',
-  'papier','feutre','stylo','gomme','couleurs','youtube','twitch','samuel',
-  'rond','chat',
-  'marqueur','aquarelle','texture','art','page','image','live',
-  'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo']
-})
+/*
+
+*/

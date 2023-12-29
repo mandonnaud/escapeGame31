@@ -1,0 +1,44 @@
+#motMeleGrille {
+  position: absolute;
+}
+.motMeleLettre {
+  display: inline-block;
+  text-transform: uppercase;
+  text-align: center;
+}
+.motMeleLettreTrouve {
+  color: #023d00;
+
+}
+.motMeleVide {
+  background: #000;
+}
+#motMeleMotRestant {
+  position: absolute;
+    top: 0;
+    right: 0;
+    text-align: center;
+    font-size: 23px;
+    width: 200px;
+}
+#motMeleMotRestant strong {
+  display: block;
+  font-size: 50px;;
+}
+#motMelePopUp {
+  position: fixed;
+  top: 0;
+  left:50%;
+  transform: translateX(-50%);
+  padding: 20px;
+  border:1px solid #000;
+}
+.motMeleLettreRouge {
+  color: #ff0000;
+}
+
+
+#teste {
+  position:fixed; top:0;left:0;width:100%;height:100%;
+  display:none;
+}

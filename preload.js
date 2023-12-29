@@ -9,7 +9,9 @@ contextBridge.exposeInMainWorld('versions', {
 })
 */
 contextBridge.exposeInMainWorld('apiEG',{
+  listeWebcam: () => ipcRenderer.invoke('listeWebcam'),
   monIp: () => ipcRenderer.invoke('monIp'),
+  twitchChoixChannel: (channel) => ipcRenderer.invoke('twitchChoixChannel',channel),
   // gestion du serveur
   startServeur: (port) => ipcRenderer.invoke('startServeur',port),
   stopServeur: () => ipcRenderer.invoke('stopServeur'),

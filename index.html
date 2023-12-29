@@ -12,6 +12,8 @@
       content="default-src 'self'; script-src 'self'"
     />
     <title>Bonjour depuis le rendu d'Electron !</title>
+    <link rel="stylesheet" href="motMele/motMelee.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <video id="webcam" autoplay playsinline width="640" height="480"></video>
@@ -30,14 +32,19 @@
         <div><label for="ecranPreJeu2ipJoueur1">Ip du joueur 1</label><input id="ecranPreJeu2ipJoueur1"></div>
         <div><label for="ecranPreJeu2portJoueur1">Port du joueur 1</label><input id="ecranPreJeu2portJoueur1" value="8080"></div>
         <div id="ecranPreJeu2boutonSuivant2" class="bouton">Suivant</div>
-
       </div>
     </div>
-    <label for="videoSource">Webcam : </label>
-    <select id="videoSource"><option value="aucun">Choisir la webcam</option></select>
+    <div id="ecranPreJeu3">
+      <!-- Choix du channel twitch -->    
+      <div><label for="ecranPreJeu3channelTwitch">Channel Twitch : </label><input id="ecranPreJeu3channelTwitch"></div>
+      <div><label for="videoSource">Webcam : </label><select id="videoSource"><option value="aucun">Choisir la webcam</option></select></div>
+      <div id="ecranPreJeu3Suivant" class="bouton">Suivant</div>
+    </div>
+    
 
     <div id="teste"></div>
     <script src="motmele.js"></script>
+    <script src="escapeGame.js"></script>
       <script src="./renderer.js"></script>
   </body>
 </html>

@@ -19,6 +19,11 @@ var _bInstancce=() => {
   var ecranPreJeu2ipJoueur1=document.getElementById("ecranPreJeu2ipJoueur1");
   var ecranPreJeu2portJoueur1=document.getElementById("ecranPreJeu2portJoueur1");
   var ecranPreJeu2boutonSuivant2=document.getElementById("ecranPreJeu2boutonSuivant2");
+  // ecranPreJeu3 : configuration du jeu
+  var ecranPreJeu3 = document.getElementById("ecranPreJeu3");
+  ecranPreJeu3.style.display="none";
+  var ecranPreJeu3Suivant=document.getElementById("ecranPreJeu3Suivant");
+  var ecranPreJeu3channelTwitch=document.getElementById("ecranPreJeu3channelTwitch");
 
   var _b={
     joueur:0,
@@ -35,6 +40,8 @@ var _bInstancce=() => {
     ecranPreJeu2boutonSuivant.addEventListener("click", function(){
       ecranPreJeu2.style.display="none";
       apiEG.startServeur(ecranPreJeu2port.value);
+      etape3();
+
     });
     ecranPreJeu2.style.display="block";
   });
@@ -46,9 +53,24 @@ var _bInstancce=() => {
     ecranPreJeu2boutonSuivant2.addEventListener("click", function(){
       ecranPreJeu2.style.display="none";
       apiEG.startClient(ecranPreJeu2portJoueur1.value,ecranPreJeu2ipJoueur1.value);
+      etape3();
     });
     ecranPreJeu2.style.display="block";
   });
+
+  etape3=() => {
+    ecranPreJeu3.style.display="block";
+    ecranPreJeu3Suivant.addEventListener("click", function(){
+      // on envois le channel twitch
+      apiEG.twitchChoixChannel(ecranPreJeu3channelTwitch.value);
+      ecranPreJeu3.style.display="none";
+      escapeGame.depart();
+
+
+    });
+    
+
+  };
 
   
 
@@ -59,4 +81,9 @@ var _b=_bInstancce();
 // on gere les retour du main
 apiEG.on('connect', () => {
   console.log('hourra');
+});
+apiEG.on('messageTwitch', (event,pseudo,message) => {
+  if (escapeGame) {
+    escapeGame.twitch(pseudo,message);
+  }
 });
