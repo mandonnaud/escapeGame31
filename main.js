@@ -13,6 +13,8 @@ var twitchReady=false;
 var tokenTwitch ='';
 var twitchChannel='';
 
+var ip=require('ip');
+
 
 var ipClient='';
 
@@ -126,6 +128,7 @@ io.on('connection', (socket) => {
   // on previens le render
   win.webContents.send('serverConnect');
   socket.on('message', (data) => {
+    console.log(data);
     // on envois le message au render
     win.webContents.send('outMessage', data);
   });
@@ -142,7 +145,7 @@ app.whenReady().then(() => {
     // on retourne l'ip de l'ordinateur (non local)
     
 
-    return ipClient;
+    return ipClient+' ou '+ip.address();
   });
   ipcMain.handle('startServeur', (event,port) => {
     console.log('LANCEMENT SERVEUR');
@@ -159,7 +162,7 @@ app.whenReady().then(() => {
     try {
       // on demarre le serveur socket.io
       // ipClient
-      server.listen(port, '192.168.1.5',() => {
+      server.listen(port,ip.address(),() => {
         serverOuvert=true;
         // on envois un message au render
         event.sender.send('serverOn');
@@ -191,12 +194,13 @@ app.whenReady().then(() => {
       console.log('Ok');
       // on ecoute les messages
       socketIo.on('message', (data) => {
+        console.log(data);
         // on envois le message au render
         event.sender.send('outMessage', data);
       });
     });
     // on envois un message au serveur
-    socketIo.emit('message', 'coucou');
+   
 
     return true;
   });
@@ -205,9 +209,10 @@ app.whenReady().then(() => {
     socketIo.close();
     return true;
   });
-  ipcMain.handle('send',  (message,important) => {
+  ipcMain.handle('send',  (event,message,important) => {
     // on envois un message au serveur
     socketIo.emit('message', message);
+    
     return true;
   });
   
