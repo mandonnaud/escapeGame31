@@ -13,10 +13,9 @@
     "electron": "^28.1.0"
   },
   "dependencies": {
-    "ip": "^1.1.8",
+    "node-webcam": "^0.8.2",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
-    "websocket": "^1.0.34",
     "ws": "^8.16.0"
   }
 }

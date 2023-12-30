@@ -9,7 +9,6 @@ contextBridge.exposeInMainWorld('versions', {
 })
 */
 contextBridge.exposeInMainWorld('apiEG',{
-  listeWebcam: () => ipcRenderer.invoke('listeWebcam'),
   monIp: () => ipcRenderer.invoke('monIp'),
   twitchChoixChannel: (channel) => ipcRenderer.invoke('twitchChoixChannel',channel),
   // gestion du serveur
@@ -21,5 +20,7 @@ contextBridge.exposeInMainWorld('apiEG',{
   // gestion des messages
   send: (message,important) => ipcRenderer.invoke('send',message,important),
   on: (message,callback) => ipcRenderer.on(message,callback),
+  // ipcRenderer.send('videoStream', stream);
+  videoStream: (stream) => ipcRenderer.invoke('videoStream',stream),
 
 });

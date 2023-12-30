@@ -141,29 +141,36 @@ var motMeleleCore=(opts) => {
     // on place le mot
     var x2=x;
     var y2=y;
+    var vectureX=orientation[0];
+    var vectureY=orientation[1];
     for (var i=0;i<lettres.length;i++) {
       if (mm.grille[x2][y2]==null) {
         nombreDeLettreRestante--;
       }
-      if (inverse) {
+      if (inverse==true) {
         mm.grille[x2][y2]=lettres[lettres.length-i-1];
       } else {
         mm.grille[x2][y2]=lettres[i];
       }
       // on passe a la lettre suivante
-      x2+=orientation[0];
-      y2+=orientation[1];
+      x2+=vectureX;
+      y2+=vectureY;
     }
     mm.listeMot.push(mot);
-    if (inverse) {
-      orientation[0]*=-1;
-      orientation[1]*=-1;
+    
+    if (inverse==true) {
+      console.log('inverse : '+mot);
+      x=x+vectureX*(lettres.length-1);
+      y=y+vectureY*(lettres.length-1);
+      if (vectureX!=0) vectureX*=-1;
+      if (vectureY!=0) vectureY*=-1;
     }
+    
     mm.listeMotData[mot]={
       mot: mot,
-      x: inverse?x2:x,
-      y: inverse?y2:y,
-      orientation: orientation
+      x: x,
+      y: y,
+      orientation: [vectureX,vectureY]
     };
   };
   // on place un mot dans la grille
@@ -178,22 +185,82 @@ var motMeleleCore=(opts) => {
     });
     // on explose le mot en lettre
     var lettres=mot.split('');
+    // on creer la version mirroir du mot
+    var lettresMirroir=[];
+    for (var i=0;i<lettres.length;i++) {
+      lettresMirroir.push(lettres[lettres.length-i-1]);
+    }
+    var motMirroire=lettresMirroir.join('');
+
     // on fouille la grille
     for (var i=0;i<mm.hauteur;i++) {
       for (var j=0;j<mm.largeur;j++) {
         // on regarde si c'est null ou la meme lettre que la premiere
-        if (mm.grille[i][j]==null || mm.grille[i][j]==lettres[0]) {
+        if (mm.grille[i][j]==lettres[0]) {
           // on verifie si on peut placer le mot
           for(var o=0; o<orientation.length;o++) {
             var qte=peuPlace(lettres,orientation[o],i,j);
             if (qte!=-1) {
+              var inverse=false;
+              if (qte==1) {
+                // une chance sur deux de placer le mot à l'envers
+                if (Math.random()>0.5) {
+                  inverse=true;
+                  console.log('inverse : '+mot);
+                }
+              }
               // on place le mot
-              place(mot,lettres,orientation[o],i,j,qte==1?true:false);
-              
+              place(mot,lettres,orientation[o],i,j,inverse);              
+              // on sort de la boucle
+              return true;
+            }
+            qte=peuPlace(lettresMirroir,orientation[o],i,j);
+            if (qte!=-1) {
+              console.log('Mirroire : '+mot);
+              // on place le mot
+              place(mot,lettres,orientation[o],i,j,true);
               // on sort de la boucle
               return true;
             }
           }
+
+          
+        }
+      }
+    }
+    // on fouille la grille
+    for (var i=0;i<mm.hauteur;i++) {
+      for (var j=0;j<mm.largeur;j++) {
+        // on regarde si c'est null ou la meme lettre que la premiere
+        if (mm.grille[i][j]==null) {
+          // on verifie si on peut placer le mot
+          for(var o=0; o<orientation.length;o++) {
+            var qte=peuPlace(lettres,orientation[o],i,j);
+            if (qte!=-1) {
+              var inverse=false;
+              if (qte==1) {
+                // une chance sur deux de placer le mot à l'envers
+                if (Math.random()>0.5) {
+                  inverse=true;
+                  console.log('inverse : '+mot);
+                }
+              }
+              // on place le mot
+              place(mot,lettres,orientation[o],i,j,inverse);              
+              // on sort de la boucle
+              return true;
+            }
+            qte=peuPlace(lettresMirroir,orientation[o],i,j);
+            if (qte!=-1) {
+              console.log('Mirroire : '+mot);
+              // on place le mot
+              place(mot,lettres,orientation[o],i,j,true);
+              // on sort de la boucle
+              return true;
+            }
+          }
+
+          
         }
       }
     }
@@ -224,7 +291,9 @@ var motMeleleCore=(opts) => {
   mm.pret=false;
   var motDicoInit=async () => {
     var mots=['bas','haut','clair','bien','rond','chat','top','beau','page','image','live','joli','fin',
-    'un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','son','ane','moi','toi',
+    'deux','trois','quatre','cinq','six','sept','huit','neuf','dix','son','ane','moi','toi','bon',
+    'nez','oeil','main','pied','bras','jambe','tete','corps','doigt','cheveux','dent','bouche','oreille','cou',
+    'tresse',
     'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo','cours'
     ];
     fouillesMotsParTaille(motParTaille(mots));
@@ -385,6 +454,7 @@ var motMeleleCore=(opts) => {
         return;
       }
       mm.listeMotData[mot].trouver=true;
+      console.log(mm.listeMotData[mot]);
       var data=mm.listeMotData[mot];
       var x=data.x;
       var y=data.y;
@@ -411,6 +481,3 @@ var motMeleleCore=(opts) => {
   
   return mm;
 };
-/*
-
-*/

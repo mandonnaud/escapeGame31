@@ -1,20 +1,32 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('node:path')
-const ip = require('ip')
+const path = require('node:path');
+
 const http = require('http');
-
 const WebSocket = require('ws');
-
 var server = http.createServer(function(req, res) {
-
+  console.log(req);
 });
+var serverOuvert=false;
 var io=require('socket.io')(server);
 var twitch=null;
+var twitchReady=false;
 var tokenTwitch ='';
 var twitchChannel='';
 
+
+var ipClient='';
+
+http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
+  resp.on('data', function(ip) {
+    
+    ipClient=ip.toString();
+  });
+});
+
+
+var win;
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1920,
     height: 1080,
     webPreferences: {
@@ -23,6 +35,15 @@ const createWindow = () => {
   })
 
   win.loadFile('index.html')
+
+  // si win est actualisé
+  win.webContents.on('did-finish-load', () => {
+    if (serverOuvert) {
+      // on stop le serveur
+      server.close();
+      serverOuvert=false;
+    }
+  });
 
 
   const win2 = new BrowserWindow({
@@ -52,9 +73,11 @@ const createWindow = () => {
       twitch.send(`PASS oauth:`+tokenTwitch);
       twitch.send('NICK EscapeGameBot');
 
+      twitchReady=true;
       if (twitchChannel!='') {
         twitch.send('JOIN #' + twitchChannel);
         twitch.send('PRIVMSG #'+twitchChannel+' :Jeu pret');
+       
       } 
 
     });
@@ -86,17 +109,69 @@ const createWindow = () => {
 
 }
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    server.close();
+    // on previens le render
+    win.webContents.send('serveurError', 'Le port est déjà utilisé');
+  } else {
+    console.log(error);
+
+  }
+});
+
+io.on('connection', (socket) => {
+  socketIo=socket;
+  console.log('a user connected');
+  // on previens le render
+  win.webContents.send('serverConnect');
+  socket.on('message', (data) => {
+    // on envois le message au render
+    win.webContents.send('outMessage', data);
+  });
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+
+
 
 app.whenReady().then(() => {
   ipcMain.handle('monIp', () => {
-    // on retourne l'ip de l'ordinateur
-    return ip.address();
+    // on retourne l'ip de l'ordinateur (non local)
+    
+
+    return ipClient;
   });
   ipcMain.handle('startServeur', (event,port) => {
+    console.log('LANCEMENT SERVEUR');
+    // on verifie si le port est bien un nombre
+    if (isNaN(port)) {
+      return false;
+    }
+    // on verifie si le port est bien entre 0 et 65535
+    if (port<0 || port>65535) {
+      return false;
+    }
     
-    // on demarre le serveur socket.io
-    console.log(port);
-    server.listen(port, ip.address());
+    
+    try {
+      // on demarre le serveur socket.io
+      // ipClient
+      server.listen(port, '192.168.1.5',() => {
+        serverOuvert=true;
+        // on envois un message au render
+        event.sender.send('serverOn');
+
+        
+      });
+      
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+   
     
     return true;
   });
@@ -108,69 +183,46 @@ app.whenReady().then(() => {
   var socketIo=null;
   ipcMain.handle('startClient', (event,port,ip) => {
     // on demarre le client socket.io
-    io = require('socket.io-client');
-    io.connect('http://' + ip + ':' + port);
+    socketIo = require('socket.io-client')('http://' + ip + ':' + port);
     
     // on verifie la connection
-    socketIo.on('connect', () => {
+    socketIo.on('connect', (socket) => {
       // on envois un message au render
-      event.sender.send('connect');
-      
+      console.log('Ok');
+      // on ecoute les messages
+      socketIo.on('message', (data) => {
+        // on envois le message au render
+        event.sender.send('outMessage', data);
+      });
     });
     // on envois un message au serveur
-    io.emit('message', 'coucou');
+    socketIo.emit('message', 'coucou');
 
     return true;
   });
   ipcMain.handle('stopClient', () => {
     // on demarre le client socket.io
-    io.close();
+    socketIo.close();
     return true;
   });
-  ipcMain.handle('send', (message,important) => {
+  ipcMain.handle('send',  (message,important) => {
     // on envois un message au serveur
-    io.emit('message', message);
+    socketIo.emit('message', message);
     return true;
   });
-  // twitchChoixChannel
+  
+
+
+
+  
   ipcMain.handle('twitchChoixChannel', (event,channel) => {
-    twitchChannel=channel;
-    if (twitch!=null) {
-      twitch.send('JOIN #' + twitchChannel);
-      twitch.send('PRIVMSG #'+twitchChannel+' :Jeu pret');
+    if (twitchChannel!=channel) {
+      twitchChannel=channel;
+      if (twitchReady) {
+        twitch.send('JOIN #' + twitchChannel);
+        twitch.send('PRIVMSG #'+twitchChannel+' :Jeu pret');
+      }   
     }
-    
-   
-    return true;
-  });
-  // listeWebcam
-  ipcMain.handle('listeWebcam', () => {
-    const { desktopCapturer } = require('electron');
-    desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-      for (const source of sources) {
-        if (source.name === 'Entire screen') {
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              audio: false,
-              video: {
-                mandatory: {
-                  chromeMediaSource: 'desktop',
-                  chromeMediaSourceId: source.id,
-                  minWidth: 1280,
-                  maxWidth: 1280,
-                  minHeight: 720,
-                  maxHeight: 720
-                }
-              }
-            })
-            handleStream(stream)
-          } catch (e) {
-            handleError(e)
-          }
-          return
-        }
-      }
-    })
     return true;
   });
 

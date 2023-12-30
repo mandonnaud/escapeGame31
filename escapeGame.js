@@ -5,6 +5,12 @@ var escapeGame=(() => {
   var listeJeu=[
     {
       init:() => {
+        apiEG.send('pretAjoueur',true);
+
+      }
+    },
+    {
+      init:() => {
         document.getElementById('teste').style.display='block';
         motMelele1=motMeleleCore({
           largeur:21,
@@ -12,8 +18,8 @@ var escapeGame=(() => {
           idHtml:'teste',
           mots:['laure','phelipon','ago','coloriages','magique','detente','crayon','dessin','peinture','pinceau',
           'papier','feutre','stylo','gomme','couleurs','youtube','twitch','samuel','portrait','bisous','fresque','fond','fusain','encre','pastel',
-          'rond','chat','tache','uni','vive','teinte','ocre','signe','lutin','inktober',
-          'marqueur','aquarelle','texture','art','page','image','live','croquis',
+          'rond','chat','tache','uni','vive','teinte','ocre','signe','lutin','inktober','qui','quoi',
+          'marqueur','aquarelle','texture','art','page','image','live','croquis','sourire','patreon','boutique','instagram',
           'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo']
         });
         console.log(motMelele1);
@@ -37,6 +43,12 @@ var escapeGame=(() => {
     }
 
   };
+  core.message=(message) => {
+    console.log(message);
+    if (listeJeu[etape] && listeJeu[etape].message) {
+      listeJeu[etape].message(message);
+    }
+  }
   core.twitch=(pseudo,message) => {
     console.log(message);
     if (listeJeu[etape] && listeJeu[etape].twitch) {
