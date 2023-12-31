@@ -83,14 +83,14 @@ var _bInstancce=() => {
       // on envois le channel twitch
       apiEG.twitchChoixChannel(ecranPreJeu3channelTwitch.value);
       ecranPreJeu3.style.display="none";
-      escapeGame.depart();
+      escapeGame.depart(_b.joueur);
 
 
     });
     
 
   };
-
+/*
   var webcam=document.getElementById("webcam");
   var listeCamera=async () => {
     var devices=await navigator.mediaDevices.enumerateDevices();
@@ -118,20 +118,22 @@ var _bInstancce=() => {
       // Utilisez le flux vidéo ici
       // Si vous avez besoin de l'envoyer au processus principal, vous pouvez le faire via IPC
       
-      /*
+      
       webcam.srcObject=stream;
       webcam.play();
-      */
+      
     })
     .catch(err => {
       console.log('Erreur lors de la récupération du flux vidéo:', err);
     });
   });
+  */
 
   
 
   return _b;
 };
+
 
 var _b=_bInstancce();
 

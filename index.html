@@ -16,11 +16,13 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <!-- <video id="webcam" autoplay playsinline width="640" height="480"></video> -->
     <div id="ecranPreJeu1">
       Ne pas streamer le jeu jusqu'a la fin de la configation (affichage de l'IP, accé admin de la partie, etc...)
-      <div id="boutonJoueur1" class="bouton">Joueur 1</div>
-      <div id="boutonJoueur2" class="bouton">Joueur 2</div>
+      <div id="ecranPreJeu1marge">
+        <div id="boutonJoueur1" class="bouton">Joueur 1</div>
+        <div id="boutonJoueur2" class="bouton">Joueur 2</div>
+      </div>
     </div>
     <div id="ecranPreJeu2">
       <div id="ecranPreJeu2joueur1">        
@@ -38,15 +40,27 @@
     <div id="ecranPreJeu3">
       <!-- Choix du channel twitch -->    
       <div><label for="ecranPreJeu3channelTwitch">Channel Twitch : </label><input id="ecranPreJeu3channelTwitch" value="adslhouba"></div>
-      <div><label for="videoSource">Webcam : </label><select id="videoSource"><option value="aucun">Choisir la webcam</option></select></div>
+      <!--<div><label for="videoSource">Webcam : </label><select id="videoSource"><option value="aucun">Choisir la webcam</option></select></div>-->
       <div id="ecranPreJeu3Suivant" class="bouton">Suivant</div>
     </div>
 
     
 
-    <div id="teste"></div>
+    <div id="epreuveMotMelee"></div>
+    <div id="epreuveDifference"></div>
+    <div id="epreuveMasterMine"></div>
+    <div id="debutEscapeGame">
+      <div id="debutEscapeGameBtPret" class="bouton"><span>Pret ?</span></div>
+      <div id="debutEscapeGame1" class="bouton"><span>Joueur 1</span></div>
+      <div id="debutEscapeGame2" class="bouton"><span>Joueur 2</span></div>
+      <div id="debutEscapeGameCompteur"></div>
+    </div>
+    <script src="m0.js"></script>
+    <script src="mAnim.js"></script>
+    <script src="difference.js"></script>
     <script src="motmele.js"></script>
+    <script src="mastermine.js"></script>
     <script src="escapeGame.js"></script>
-      <script src="./renderer.js"></script>
+    <script src="./renderer.js"></script>
   </body>
 </html>

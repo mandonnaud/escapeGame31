@@ -11,6 +11,9 @@ var motMeleleCore=(opts) => {
     theParent = document.body;
   }
 
+  // callBackTrouver
+  mm.callBackTrouver=opts.callBackTrouver || null;
+
   // on verifie les options
   var opts=opts || {};
   // on verifie la largeur
@@ -299,6 +302,9 @@ var motMeleleCore=(opts) => {
     fouillesMotsParTaille(motParTaille(mots));
     divMotRestant.innerHTML='<strong>'+mm.listeMot.length+'</strong> mots à trouver';
     mm.pret=true;
+    if (mm.callBackTrouver) {
+      mm.callBackTrouver(mm.listeMot.length);
+    }
   }
   var fouillesMotsParTaille=async (data) => {
     var mots=data[0];
@@ -444,7 +450,6 @@ var motMeleleCore=(opts) => {
 
 
   mm.proposition=(mot,qui) => {
-
     if (mm.pret==false) {
       return;
     }
@@ -454,7 +459,6 @@ var motMeleleCore=(opts) => {
         return;
       }
       mm.listeMotData[mot].trouver=true;
-      console.log(mm.listeMotData[mot]);
       var data=mm.listeMotData[mot];
       var x=data.x;
       var y=data.y;
@@ -474,6 +478,9 @@ var motMeleleCore=(opts) => {
         mot: mot,
         qui: qui
       });
+      if (mm.callBackTrouver) {
+        mm.callBackTrouver(mm.listeMot.length);
+      }
       divMotRestant.innerHTML='<strong>'+mm.listeMot.length+'</strong> mots à trouver';
     }
   };

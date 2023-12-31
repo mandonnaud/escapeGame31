@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('apiEG',{
   startClient: (port,ip) => ipcRenderer.invoke('startClient',port,ip),
   stopClient: () => ipcRenderer.invoke('stopClient'),
   // gestion des messages
-  send: (message,important) => ipcRenderer.invoke('send',message,important),
+  send: (message) => ipcRenderer.invoke('send',message),
   on: (message,callback) => ipcRenderer.on(message,callback),
   // ipcRenderer.send('videoStream', stream);
   videoStream: (stream) => ipcRenderer.invoke('videoStream',stream),

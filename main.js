@@ -31,6 +31,7 @@ const createWindow = () => {
   win = new BrowserWindow({
     width: 1920,
     height: 1080,
+    titleBarStyle:'hidden',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -50,7 +51,8 @@ const createWindow = () => {
 
   const win2 = new BrowserWindow({
     width: 400,
-    height: 800
+    height: 800,
+    titleBarStyle:'hidden',
   });
   win2.loadURL('https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=b5z3gqy4nv2mtw6iv8g4mk5cvdxi4y&redirect_uri=http://localhost&scope=chat%3Aread+chat%3Aedit');
 
@@ -128,7 +130,7 @@ io.on('connection', (socket) => {
   // on previens le render
   win.webContents.send('serverConnect');
   socket.on('message', (data) => {
-    console.log(data);
+    console.log('=>'+data);
     // on envois le message au render
     win.webContents.send('outMessage', data);
   });
@@ -209,9 +211,14 @@ app.whenReady().then(() => {
     socketIo.close();
     return true;
   });
-  ipcMain.handle('send',  (event,message,important) => {
+  ipcMain.handle('send',  (event,message) => {
     // on envois un message au serveur
-    socketIo.emit('message', message);
+    if (socketIo) {
+     socketIo.emit('message', message);
+    } else {
+      io.emit('message', message);
+    }
+    
     
     return true;
   });

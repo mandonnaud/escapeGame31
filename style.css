@@ -21,3 +21,163 @@ body  {
 * {
   box-sizing: border-box;
 }
+#ecranPreJeu1, #ecranPreJeu2, #ecranPreJeu3, #debutEscapeGame {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 60%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+#ecranPreJeu1marge {
+  padding: 20px;
+}
+#debutEscapeGame1.pret, #debutEscapeGame2.pret {
+  background: rgb(0, 63, 0);
+}
+#debutEscapeGameCompteur {
+  font-size: 40px;
+}
+
+#epreuveMotMelee, #epreuveDifference, #epreuveMasterMine {
+  position:fixed; top:0;left:0;width:70%;height:100%;
+  display:none;
+}
+
+
+#etapeSolo {
+  position:absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+}
+#etapeSoloImg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 0;
+}
+.differenceImage12 {
+  position: absolute;
+  z-index: 1;
+}
+.differenceImageMulti {
+  position: absolute;
+}
+#cacheReponse {
+  background: #000;
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  top:0;
+  left:0;
+}
+
+
+
+#masterminePropositionListe {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transform: translate(0,-50%);
+}
+#masterminePropositionLesCouleurs {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  text-align: center;
+  transform: translate(0,-50%);
+}
+#masterminePropositionAntiClick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  opacity: 0.5;
+  z-index: 5;
+}
+#masterminePropositionTwitchValider {
+  position: absolute;
+  top: 83%;
+  left: 83%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #FFF;
+  padding: 30px;
+  cursor: pointer;
+}
+.masterminePropositionChoix {
+  border: 4px solid #FFF;
+  width: 80px;
+  height: 80px;
+  display: inline-block;
+  margin: 18px;
+  border-radius: 40px;
+  cursor: pointer;
+}
+.masterminePropositionLesCouleursDiv  {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  margin: 16px;
+  cursor: pointer;
+}
+.masterminePropositionTwitchDiv {
+  display: block;
+  position: absolute;
+  transform: translate(-50%, -50%);
+
+}
+#masterminePropositionValider {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  margin-top: 100px;
+}
+#mastermineIndiceResultat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+}
+#mastermineIndiceResultatTexte {
+  font-size: 20px;
+  padding-bottom: 30px;
+}
+.masterminePropositionTwitchDiv span {
+  position: absolute;
+  bottom: -20px;
+}
+.crouge {
+  background: #ff0000;
+}
+.cvert {
+  background: #00ff00;
+}
+.cbleu {
+  background: #0000ff;
+}
+.cjaune {
+  background: #ffff00;
+}
+.corange {
+  background: #ff8000;
+}
+.cviolet {
+  background: #b300ff;
+}
+.crose {
+  background: #ff0080;
+}
+.cblanc {
+  background: #fff;
+}
