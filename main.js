@@ -87,6 +87,16 @@ const createWindow = () => {
     });
     twitch.on('message', (data) => {
       data=data.toString();
+      console.log(data);
+      // 
+      // si le message commence par :tmi.twitch.tv 001
+      if (data.indexOf(':tmi.twitch.tv 001') != -1) {
+        // on cherche le pseudo dans ":tmi.twitch.tv 001 adslhouba :Welcome, GLHF!" le pseudo est adslhouba
+        var pseudo=data.split(':tmi.twitch.tv 001 ')[1].split(' :Welcome, GLHF!')[0];
+        // on envois le message au render
+        win.webContents.send('twitchPseudo', pseudo);
+        
+      }
       // PING
       if (data.indexOf('PING') != -1) {
         twitch.send('PONG :tmi.twitch.tv');

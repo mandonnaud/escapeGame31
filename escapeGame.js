@@ -40,8 +40,8 @@ var escapeGame=(() => {
         var epreuveMotMelee=document.getElementById('epreuveMotMelee');
         epreuveMotMelee.style.display='block';
         motMelele1=motMeleleCore({
-          largeur:21,
-          hauteur:14,
+          largeur:15,
+          hauteur:17,
           idHtml:'epreuveMotMelee',
           callBackTrouver:(qteMotRestant) => {
             send({msg:'motRestant',qte:qteMotRestant},qteMotRestant==0);
@@ -57,6 +57,75 @@ var escapeGame=(() => {
           'rond','chat','tache','uni','vive','teinte','ocre','signe','lutin','inktober','qui','quoi',
           'marqueur','aquarelle','texture','art','page','image','live','croquis','sourire','patreon','boutique','instagram',
           'rouge','vert','bleu','noir','cyan','magenta','jaune','orange','violet','rose','gris','blanc','marron','beige','turquoise','indigo']
+        });
+        // on creer le div pour afficher les mots restant de l'autre
+        motMelele1div=document.createElement('div');
+        motMelele1div.id='motMeleMotRestantAutre';
+        epreuveMotMelee.appendChild(motMelele1div);
+      },
+      message:(data) => {
+        if (data.msg=='motRestant') {
+          motMelele1div.innerHTML='<strong>'+data.qte+'</strong> restant chez l\'autre';
+          if (numJoueur==1) {
+            if (data.qte==0) {
+              motMelele1J2=true;
+              motMeleleFini();
+            }
+
+          }
+        }
+      },
+      twitch:(peudo,message) => {
+        if (motMelele1!=null) {
+          motMelele1.proposition(message,peudo);
+        }
+        
+      }
+    };
+  };
+  var etapeMotMele2=() => {
+    var motMelele1=null;
+    var motMelele1div=null;
+    var motMelele1J1=false;
+    var motMelele1J2=false;
+    var motMeleleFini=() => {
+      if (motMelele1J1 && motMelele1J2) {
+        setTimeout(() => {
+          etapeSuivanteJ1();
+        },3000);
+      }
+    };
+    return {
+      out:() => {
+        var epreuveMotMelee=document.getElementById('epreuveMotMelee');
+        epreuveMotMelee.style.display='none';
+        epreuveMotMelee.innerHTML='';
+      },
+      init:() => {
+        var epreuveMotMelee=document.getElementById('epreuveMotMelee');
+        epreuveMotMelee.style.display='block';
+        epreuveMotMelee.innerHTML='';
+        motMelele1=motMeleleCore({
+          largeur:18,
+          hauteur:20,
+          idHtml:'epreuveMotMelee',
+          callBackTrouver:(qteMotRestant) => {
+            send({msg:'motRestant',qte:qteMotRestant},qteMotRestant==0);
+            if (numJoueur==1) {
+              if (qteMotRestant==0) {                
+                motMelele1J1=true;
+                motMeleleFini();
+              }
+            }
+          },
+          mots:['challenge','greebouille','reveillon','champagne','cotillon',
+            'tutos','pivoine','goutte','effet','tokyo','alcool','invite','mystere','duo',
+            'nocturne','nuit','herisson','monstre','indienne','portrait',
+            'sagittaire','mignon','louve','fille','giraf','lion','chat',
+            'enfant','garcon','licorne','doudou','ours','lapin',
+            'kaola','chien','fleur','tasse','renard','dragon',
+           'visage','cheval','panda','tortue','fee','cerf','arbre','poney','plump','tigre','punk','renne','souris','aigle'
+          ]
         });
         // on creer le div pour afficher les mots restant de l'autre
         motMelele1div=document.createElement('div');
@@ -100,15 +169,20 @@ var escapeGame=(() => {
       } else {
         debutEscapeGame2.classList.add('pret');
       }
+      debutEscapeGame1.style.display='inline-block';
+      debutEscapeGame2.style.display='inline-block';
+      debutEscapeGame1.style.opacity=0;
+      debutEscapeGame2.style.opacity=0;
       mAnim(debutEscapeGame1).fadeIn();
       mAnim(debutEscapeGame2).fadeIn();
       send({msg:'debutPret'});
     });
     var deuxPret=() => {
       if (pret1 && pret2) {
-        compteur();
-        send({msg:'compteur'});
-
+        setTimeout(() => {
+          compteur();
+          send({msg:'compteur'});
+        },1000);
         
       }
     }
@@ -143,6 +217,9 @@ var escapeGame=(() => {
       init:() => {
         mAnim(debutEscapeGame).fadeIn();
       },
+      out:() => {
+        debutEscapeGame.style.display='none';
+      },
       message:(data) => {
         switch(data.msg) {
           case 'debutPret':
@@ -165,7 +242,11 @@ var escapeGame=(() => {
   var etapeLabonneImage=() => {
     return differnceCore();
   }
+
+  var finEscapeGame=document.getElementById('finEscapeGame');
+  finEscapeGame.style.display='none';
   
+  var mastermineJSetape=mastermineJS();
   var listeJeu=[
     {
       init:() => {
@@ -182,13 +263,16 @@ var escapeGame=(() => {
 
       }
     },
-    mastermineJS(),
     debutCore(),
+    mastermineJSetape,
     etapeMotMele(),
+    mastermineJSetape,
+    etapeMotMele2(),
+    mastermineJSetape,
     etapeLabonneImage(),
     {
       init:() => {
-        alert('GAGENER');
+        mAnim(finEscapeGame).dure(4000).fadeIn();
       }
     }
   ];

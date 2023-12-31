@@ -1,5 +1,5 @@
 var differnceCore=(numJoueur) => {
-  var listeImage=['bureau','jardin','laure','ago','joke'];
+  var listeImage=['bureau','jardin','chat','laure','ago','joke'];
   var etape=0;
   var epreuveDifference=document.getElementById("epreuveDifference");
 

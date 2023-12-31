@@ -26,7 +26,7 @@ var _bInstancce=() => {
   ecranPreJeu3.style.display="none";
   var ecranPreJeu3Suivant=document.getElementById("ecranPreJeu3Suivant");
   var ecranPreJeu3channelTwitch=document.getElementById("ecranPreJeu3channelTwitch");
-  var videoSource=document.getElementById("videoSource");
+  //var videoSource=document.getElementById("videoSource");
 
   var _b={
     joueur:0,
@@ -151,4 +151,8 @@ apiEG.on('outMessage', (event,message) => {
   if (escapeGame) {
     escapeGame.message(message);
   }
+});
+// twitchPseudo
+apiEG.on('twitchPseudo', (event,pseudo) => {
+  document.getElementById("ecranPreJeu3channelTwitch").value=pseudo;
 });

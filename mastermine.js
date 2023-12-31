@@ -39,6 +39,8 @@ var mastermineJS=() => {
         }
       break;
     }
+    
+    console.log(tirage);
     nouvelleEtape();
   }
 
@@ -249,7 +251,8 @@ var mastermineJS=() => {
     indiceResultat.style.display='none';
     if (numJoueur==1) {
       if (epreuveFini) {
-        nouvelleEpreuve();
+        escapeGame.etapeSuivanteJ1();
+        //nouvelleEpreuve();
       } else {
         nouvelleEtape();
       }
@@ -366,7 +369,8 @@ var mastermineJS=() => {
         case 'mastermineEtapeIndinceValider':
           if (numJoueur==1) {
             if (epreuveFini) {
-              nouvelleEpreuve();
+              escapeGame.etapeSuivanteJ1();
+              //nouvelleEpreuve();
             } else {
               nouvelleEtape();
             }
